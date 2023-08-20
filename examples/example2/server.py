@@ -1,6 +1,7 @@
 import socket
 import sys
 import threading
+import headers
 
 if len(sys.argv) != 2:
     print(f"Usage: {sys.argv[0]} <port>")
@@ -8,11 +9,6 @@ if len(sys.argv) != 2:
 
 SERVER_IP = socket.gethostbyname(socket.gethostname())
 SERVER_PORT = int(sys.argv[1])
-HEADER_SIZE_BODY_LEN = 10
-HEADER_SIZE_NAME_LEN = 30
-
-def appendHeaders(message, name):
-    return bytes(f"{len(message):<{HEADER_SIZE_BODY_LEN}}" + f"{name:<{HEADER_SIZE_NAME_LEN}}" + message, "utf-8")
 
 def receiveMessage(conn, length):
     msg = conn.recv(length)
@@ -25,8 +21,8 @@ server.bind((SERVER_IP, SERVER_PORT))
 def handleConnection(conn, addr):
     while True:
         try:
-            msgSize = int(conn.recv(HEADER_SIZE_BODY_LEN).decode())
-            name = conn.recv(HEADER_SIZE_NAME_LEN).decode().rstrip('\x00').strip()
+            msgSize = int(conn.recv(headers.HEADER_SIZE_BODY_LEN).decode())
+            name = conn.recv(headers.HEADER_SIZE_NAME_LEN).decode().rstrip('\x00').strip()
             msg = conn.recv(msgSize).decode()
         except Exception as e:
             print(f"Error: {e}")
@@ -35,7 +31,7 @@ def handleConnection(conn, addr):
         print(f"[{name}] {msg}!")
 
         response = f"{name} said: {msg}"
-        response = appendHeaders(response, "SERVER")
+        response = headers.appendHeaders(response, "SERVER")
         conn.send(response)
 
     conn.close()
