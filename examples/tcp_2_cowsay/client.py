@@ -29,12 +29,14 @@ try:
             name = receiveMessage(sock, headers.HEADER_SIZE_NAME_LEN).decode().rstrip('\x00').strip()
             msg = b''
             while len(msg) < msgSize:
-                msg += receiveMessage(sock, msgSize - len(msg)).decode()
+                msg += receiveMessage(sock, msgSize - len(msg))
+            msg = msg.decode()
+
         except Exception as e:
             print(f"Error: {e}")
             break
 
-        print(f"[{name}] {msg}!")
+        print(msg)
 
 except KeyboardInterrupt:
     sock.close()

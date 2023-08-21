@@ -2,6 +2,7 @@ import socket
 import sys
 import threading
 import headers
+import cowsay
 
 if len(sys.argv) != 2:
     print(f"Usage: {sys.argv[0]} <port>")
@@ -27,15 +28,15 @@ def handleConnection(conn, addr):
             name = receiveMessage(conn, headers.HEADER_SIZE_NAME_LEN).decode().rstrip('\x00').strip()
             msg = b''
             while len(msg) < msgSize:
-                msg += receiveMessage(conn, msgSize - len(msg)).decode()
-                
+                msg += receiveMessage(conn, msgSize - len(msg))
+            
+            msg = msg.decode()
         except Exception as e:
             print(f"Error: {e}")
             break
 
-        print(f"[{name}] {msg}!")
-
-        response = f"{name} said: {msg}"
+        response = cowsay.get_output_string("cow", f"[{name}]: {msg}")
+        print(response)
         response = headers.appendHeaders(response, "SERVER")
         conn.send(response)
 
