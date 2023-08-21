@@ -2,6 +2,7 @@ import socket
 import sys
 import threading
 import contents
+import cowsay
 from PIL import Image
 import io
 
@@ -25,9 +26,15 @@ server.bind((SERVER_IP, SERVER_PORT))
 def handleTextMessage(conn, content):
     msg = content["content"]
     name = content["name"]
-    print(f"[{name}] {msg}!")
+    animal = content["animal"]
+    
+    try:
+        response = cowsay.get_output_string(animal, f"[{name}]: {msg}")
+    except Exception as e:
+        response = f"Error: {e}"
 
-    response = f"{name} said: {msg}"
+    print(response)
+    
     response = contents.pack(response, "text", "SERVER")
     conn.sendall(response)
 
@@ -57,7 +64,6 @@ def handleConnection(conn, addr):
             while len(content) < msgSize:
                 content += receiveMessage(conn, msgSize - len(content))
                                           
-            print(len(content))
             content = contents.unpack(content)
         except Exception as e:
             print(f"Error: {e}")

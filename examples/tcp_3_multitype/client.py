@@ -18,8 +18,7 @@ def receiveMessage(conn, length):
     
 def handleTextMessage(content):
     msg = content["content"]
-    name = content["name"]
-    print(f"[{name}] {msg}!")
+    print(msg)
 
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -31,7 +30,8 @@ try:
         content = None
         if contentType == "text":
             msg = input("Enter your message: ")
-            content = contents.pack(msg, "text", username)
+            animal = input("Enter animal: ")
+            content = contents.pack(msg, "text", username, animal)
 
         elif contentType == "image":
             path = input("Enter image path: ")
