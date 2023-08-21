@@ -14,16 +14,21 @@ def receiveMessage(conn, length):
     msg = conn.recv(length)
     if not msg:
         raise Exception("Connection closed")
+    return msg
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server.bind((SERVER_IP, SERVER_PORT))
 
 def handleConnection(conn, addr):
     while True:
         try:
-            msgSize = int(conn.recv(headers.HEADER_SIZE_BODY_LEN).decode())
-            name = conn.recv(headers.HEADER_SIZE_NAME_LEN).decode().rstrip('\x00').strip()
-            msg = conn.recv(msgSize).decode()
+            msgSize = int(receiveMessage(conn, headers.HEADER_SIZE_BODY_LEN).decode())
+            name = receiveMessage(conn, headers.HEADER_SIZE_NAME_LEN).decode().rstrip('\x00').strip()
+            msg = b''
+            while len(msg) < msgSize:
+                msg += receiveMessage(conn, msgSize - len(msg)).decode()
+                
         except Exception as e:
             print(f"Error: {e}")
             break

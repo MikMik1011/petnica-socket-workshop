@@ -47,7 +47,9 @@ try:
 
         try:
             msgSize = int(receiveMessage(sock, contents.HEADER_SIZE_BODY_LEN).decode())   
-            content = receiveMessage(sock, msgSize)
+            content = b""
+            while len(content) < msgSize:
+                content += receiveMessage(sock, msgSize - len(content))
             content = contents.unpack(content)
         except Exception as e:
             print(f"Error: {e}")

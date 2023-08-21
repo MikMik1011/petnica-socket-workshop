@@ -13,6 +13,7 @@ def receiveMessage(conn, length):
     msg = conn.recv(length)
     if not msg:
         raise Exception("Connection closed")
+    return msg
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 username = input("Enter your name: ")
@@ -24,9 +25,11 @@ try:
         sock.send(msg)
 
         try:
-            msgSize = int(sock.recv(headers.HEADER_SIZE_BODY_LEN).decode())
-            name = sock.recv(headers.HEADER_SIZE_NAME_LEN).decode().rstrip('\x00').strip()
-            msg = sock.recv(msgSize).decode()
+            msgSize = int(receiveMessage(sock, headers.HEADER_SIZE_BODY_LEN).decode())
+            name = receiveMessage(sock, headers.HEADER_SIZE_NAME_LEN).decode().rstrip('\x00').strip()
+            msg = b''
+            while len(msg) < msgSize:
+                msg += receiveMessage(sock, msgSize - len(msg)).decode()
         except Exception as e:
             print(f"Error: {e}")
             break

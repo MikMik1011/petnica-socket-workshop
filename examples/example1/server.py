@@ -10,6 +10,7 @@ SERVER_IP = socket.gethostbyname(socket.gethostname())
 SERVER_PORT = int(sys.argv[1])
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server.bind((SERVER_IP, SERVER_PORT))
 
 
