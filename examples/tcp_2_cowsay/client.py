@@ -25,8 +25,8 @@ try:
         sock.send(msg)
 
         try:
-            msgSize = int(receiveMessage(sock, headers.HEADER_SIZE_BODY_LEN).decode())
-            name = receiveMessage(sock, headers.HEADER_SIZE_NAME_LEN).decode().rstrip('\x00').strip()
+            msgSize = int.from_bytes(receiveMessage(sock, headers.HEADER_LEN))
+            name = receiveMessage(sock, headers.NAME_LEN).decode().rstrip('\x00').strip()
             msg = b''
             while len(msg) < msgSize:
                 msg += receiveMessage(sock, msgSize - len(msg))

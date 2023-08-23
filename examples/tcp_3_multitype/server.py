@@ -71,7 +71,7 @@ contentTypeHandlers = {
 def handleConnection(conn, addr):
     while True:
         try:
-            msgSize = int(receiveMessage(conn, contents.HEADER_SIZE_BODY_LEN).decode())
+            msgSize = int.from_bytes(receiveMessage(conn, contents.HEADER_LEN))
             content = b""
             while len(content) < msgSize:
                 content += receiveMessage(conn, msgSize - len(content))

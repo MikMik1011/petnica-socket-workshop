@@ -57,7 +57,7 @@ try:
         sock.send(content)
 
         try:
-            msgSize = int(receiveMessage(sock, contents.HEADER_SIZE_BODY_LEN).decode())   
+            msgSize = int.from_bytes(receiveMessage(sock, contents.HEADER_LEN))   
             content = b""
             while len(content) < msgSize:
                 content += receiveMessage(sock, msgSize - len(content))

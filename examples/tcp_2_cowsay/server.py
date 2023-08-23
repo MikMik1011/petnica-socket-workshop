@@ -24,8 +24,8 @@ server.bind((SERVER_IP, SERVER_PORT))
 def handleConnection(conn, addr):
     while True:
         try:
-            msgSize = int(receiveMessage(conn, headers.HEADER_SIZE_BODY_LEN).decode())
-            name = receiveMessage(conn, headers.HEADER_SIZE_NAME_LEN).decode().rstrip('\x00').strip()
+            msgSize = int.from_bytes(receiveMessage(conn, headers.HEADER_LEN))
+            name = receiveMessage(conn, headers.NAME_LEN).decode().rstrip('\x00').strip()
             msg = b''
             while len(msg) < msgSize:
                 msg += receiveMessage(conn, msgSize - len(msg))
