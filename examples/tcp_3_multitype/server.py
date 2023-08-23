@@ -4,7 +4,10 @@ import threading
 import contents
 import cowsay
 from PIL import Image
+import deeppyer
+import asyncio
 import io
+from tempfile import TemporaryFile
 
 if len(sys.argv) != 2:
     print(f"Usage: {sys.argv[0]} <port>")
@@ -23,7 +26,13 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server.bind((SERVER_IP, SERVER_PORT))
 
-def handleTextMessage(conn, content):
+async def deepfry(img):
+    img_stream = io.BytesIO(img)
+    image = Image.open(img_stream)
+    return await deeppyer.deepfry(image, flares=False)
+
+
+async def handleTextMessage(conn, content):
     msg = content["content"]
     name = content["name"]
     animal = content["animal"]
@@ -38,18 +47,22 @@ def handleTextMessage(conn, content):
     response = contents.pack(response, "text", "SERVER")
     conn.sendall(response)
 
-def handleImageMessage(conn, content):
+async def handleImageMessage(conn, content):
     img = content["content"]
     name = content["name"]
     print(f"[{name}] sent an image!")
 
-    response = f"{name} sent an image!"
-    response = contents.pack(response, "text", "SERVER")
-    conn.sendall(response)
+    image = await deepfry(img)
 
-    img_stream = io.BytesIO(img)
-    image = Image.open(img_stream)
-    image.show(title=f"{name}'s image")
+    with TemporaryFile() as f:
+        image.save(f, format="PNG")
+        f.seek(0)
+        img = f.read()
+    
+    response = contents.pack(img, "image", "SERVER")
+    conn.sendall(response)
+    image.show()
+    
 
 contentTypeHandlers = {
     "text": handleTextMessage,
@@ -68,8 +81,10 @@ def handleConnection(conn, addr):
         except Exception as e:
             print(f"Error: {e}")
             break
-        
-        contentTypeHandlers[content["type"]](conn, content)
+
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(contentTypeHandlers[content["type"]](conn, content))
 
     conn.close()
     print(f"Closed connection from {addr}")
