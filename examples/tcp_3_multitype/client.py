@@ -2,6 +2,7 @@ import socket
 import sys
 import contents
 from PIL import Image
+import io
 
 if len(sys.argv) != 3:
     print(f"Usage: {sys.argv[0]} <ip> <port>")
@@ -16,9 +17,19 @@ def receiveMessage(conn, length):
         raise Exception("Connection closed")
     return msg
     
-def handleTextMessage(content):
+def handleTextContent(content):
     msg = content["content"]
     print(msg)
+
+def handleImageContent(content):
+    img = content["content"]
+    image = Image.open(io.BytesIO(img))
+    image.show()
+
+contentTypeHandlers = {
+    "text": handleTextContent,
+    "image": handleImageContent
+}
 
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -55,7 +66,7 @@ try:
             print(f"Error: {e}")
             break
         
-        handleTextMessage(content)
+        contentTypeHandlers[content["type"]](content)
 
 except KeyboardInterrupt:
     sock.close()

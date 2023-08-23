@@ -32,7 +32,7 @@ async def deepfry(img):
     return await deeppyer.deepfry(image, flares=False)
 
 
-async def handleTextMessage(conn, content):
+async def handleTextContent(conn, content):
     msg = content["content"]
     name = content["name"]
     animal = content["animal"]
@@ -47,7 +47,7 @@ async def handleTextMessage(conn, content):
     response = contents.pack(response, "text", "SERVER")
     conn.sendall(response)
 
-async def handleImageMessage(conn, content):
+async def handleImageContent(conn, content):
     img = content["content"]
     name = content["name"]
     print(f"[{name}] sent an image!")
@@ -61,12 +61,11 @@ async def handleImageMessage(conn, content):
     
     response = contents.pack(img, "image", "SERVER")
     conn.sendall(response)
-    image.show()
     
 
 contentTypeHandlers = {
-    "text": handleTextMessage,
-    "image": handleImageMessage
+    "text": handleTextContent,
+    "image": handleImageContent
 }
 
 def handleConnection(conn, addr):
