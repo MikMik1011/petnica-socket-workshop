@@ -1,4 +1,4 @@
 cowsay==5.0
 deeppyer==1.0.1
 msgpack==1.0.5
-Pillow==9.2.0
+Pillow==10.0.0
