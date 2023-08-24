@@ -25,16 +25,16 @@ def handleConnection(conn, addr):
     while True:
         try:
             msgSize = int.from_bytes(receiveMessage(conn, headers.HEADER_LEN))
-            msg = b''
-            while len(msg) < msgSize:
-                msg += receiveMessage(conn, msgSize - len(msg))
-            
-            msg = msg.decode()
+            content = b""
+            while len(content) < msgSize:
+                content += receiveMessage(conn, msgSize - len(content))
+                                          
+            content = content.decode('utf-8')
         except Exception as e:
             print(f"Error: {e}")
             break
 
-        response = cowsay.get_output_string("cow", msg)
+        response = cowsay.get_output_string("cow", content)
         print(response)
         response = headers.appendHeaders(response)
         conn.send(response)

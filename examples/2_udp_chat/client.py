@@ -22,14 +22,14 @@ def create_client_chat_socket(ip):
 def receive(sock):
     while True:
         data, addr = sock.recvfrom(2000)
-        msg = data.decode()
+        msg = data.decode('utf-8')
         print(msg)
 
 def send(ip, port, name, sock):
-    sock.sendto(f"{name} has joined the chat!".encode(), (ip, port))
+    sock.sendto(f"{name} has joined the chat!".encode('utf-8'), (ip, port))
     while True:
         msg = input()
-        sock.sendto(f"[{name}]: {msg}".encode(), (ip, port))
+        sock.sendto(f"[{name}]: {msg}".encode('utf-8'), (ip, port))
 
 def main():
     if len(sys.argv) != 3:

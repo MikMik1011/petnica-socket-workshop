@@ -1,13 +1,13 @@
 import socket
 import sys
 
-socketTypes = {
+socket_types = {
     "TCP": socket.SOCK_STREAM,
     "UDP": socket.SOCK_DGRAM
 }
 
 def create_client_socket(ip, port, type="TCP"):
-    client = socket.socket(socket.AF_INET, socketTypes[type])
+    client = socket.socket(socket.AF_INET, socket_types[type])
     client.connect((ip, port))
     return client
 
@@ -20,10 +20,10 @@ def main():
     SERVER_PORT = int(sys.argv[2])
 
     sock = create_client_socket(SERVER_IP, SERVER_PORT, "UDP")
-    sock.send(b"Hello world")
+    sock.sendall(input("Enter your message: ").encode('utf-8'))
 
     data, addr = sock.recvfrom(1024)
-    print(f"[SERVER] {data.decode()}")
+    print(f"[SERVER] {data.decode('utf-8')}")
 
     sock.close()
 

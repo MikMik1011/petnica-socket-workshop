@@ -11,7 +11,7 @@ if len(sys.argv) != 3:
 SERVER_IP = sys.argv[1]
 SERVER_PORT = int(sys.argv[2])
 
-def receiveMessage(conn, length):
+def receive_message(conn, length):
     msg = conn.recv(length)
     if not msg:
         raise Exception("Connection closed")
@@ -54,13 +54,13 @@ try:
             print("Invalid content type")
             continue
 
-        sock.send(content)
+        sock.sendall(content)
 
         try:
-            msgSize = int.from_bytes(receiveMessage(sock, contents.HEADER_LEN))   
+            msgSize = int.from_bytes(receive_message(sock, contents.HEADER_LEN))   
             content = b""
             while len(content) < msgSize:
-                content += receiveMessage(sock, msgSize - len(content))
+                content += receive_message(sock, msgSize - len(content))
             content = contents.unpack(content)
         except Exception as e:
             print(f"Error: {e}")

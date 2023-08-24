@@ -8,7 +8,7 @@ unsent_messages = []
 def receive(sock):
     while True:
         data, addr = sock.recvfrom(2000)
-        msg = data.decode()
+        msg = data.decode('utf-8')
         print(addr, msg)
         if addr not in clients:
             clients.append(addr)
@@ -25,7 +25,7 @@ def broadcast(sock):
                     sock.sendto(data, client)
                 except:
                     clients.remove(client)
-                    unsent_messages.append(f"[SERVER] Goodbye {client}!".encode())
+                    unsent_messages.append(f"[SERVER] Goodbye {client}!".encode('utf-8'))
 
 def main():
     if len(sys.argv) != 2:
