@@ -3,33 +3,47 @@ import threading
 import sys
 import random
 
-server_ip = sys.argv[1]
-server_port = int(sys.argv[2])
+def create_client_chat_socket(ip):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    client_port = None
+    while not client_port:
+        port = random.randint(10000, 20000)
+        try:
+            sock.bind((ip, port))
+            client_port = port
+            print("Bound on port", client_port)
+        except:
+            pass
+    
+    return sock
 
-client_port = None
-while not client_port:
-    port = random.randint(10000, 20000)
-    try:
-        sock.bind((server_ip, port))
-        client_port = port
-    except:
-        pass
-
-name = input("Enter your name: ")
-
-def receive():
+def receive(sock):
     while True:
         data, addr = sock.recvfrom(2000)
         msg = data.decode()
         print(msg)
 
-def send():
+def send(ip, port, name, sock):
+    sock.sendto(f"{name} has joined the chat!".encode(), (ip, port))
     while True:
         msg = input()
-        sock.sendto(f"[{name}]: {msg}".encode(), (server_ip, server_port))
+        sock.sendto(f"[{name}]: {msg}".encode(), (ip, port))
 
-threading.Thread(target=receive).start()
-threading.Thread(target=send).start()
+def main():
+    if len(sys.argv) != 3:
+        print(f"Usage: {sys.argv[0]} <server_ip> <server_port>")
+        sys.exit(1)
+        
+    server_ip = sys.argv[1]
+    server_port = int(sys.argv[2])
+    
+    sock = create_client_chat_socket(server_ip)
+    name = input("Enter your name: ")
+
+    threading.Thread(target=receive, args=(sock, )).start()
+    threading.Thread(target=send, args=(server_ip, server_port, name, sock)).start()
+
+if __name__ == "__main__":
+    main()
