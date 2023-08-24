@@ -8,12 +8,12 @@ if len(sys.argv) != 3:
 SERVER_IP = sys.argv[1]
 SERVER_PORT = int(sys.argv[2])
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 sock.connect((SERVER_IP, SERVER_PORT))
-sock.send(b"Hello, world!")
+sock.send(b"Hello world")
 
-data = sock.recv(1024)
+data, addr = sock.recvfrom(1024)
 print(f"[SERVER] {data.decode()}")
 
 sock.close()
