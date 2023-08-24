@@ -21,12 +21,12 @@ sock.connect((SERVER_IP, SERVER_PORT))
 try:
     while True:
         msg = input("Enter your message: ")
-        msg = headers.appendHeaders(msg, username)
+        msg = f"[{username}]: {msg}"
+        msg = headers.appendHeaders(msg)
         sock.send(msg)
 
         try:
             msgSize = int.from_bytes(receiveMessage(sock, headers.HEADER_LEN))
-            name = receiveMessage(sock, headers.NAME_LEN).decode().rstrip('\x00').strip()
             msg = b''
             while len(msg) < msgSize:
                 msg += receiveMessage(sock, msgSize - len(msg))

@@ -25,7 +25,6 @@ def handleConnection(conn, addr):
     while True:
         try:
             msgSize = int.from_bytes(receiveMessage(conn, headers.HEADER_LEN))
-            name = receiveMessage(conn, headers.NAME_LEN).decode().rstrip('\x00').strip()
             msg = b''
             while len(msg) < msgSize:
                 msg += receiveMessage(conn, msgSize - len(msg))
@@ -35,9 +34,9 @@ def handleConnection(conn, addr):
             print(f"Error: {e}")
             break
 
-        response = cowsay.get_output_string("cow", f"[{name}]: {msg}")
+        response = cowsay.get_output_string("cow", msg)
         print(response)
-        response = headers.appendHeaders(response, "SERVER")
+        response = headers.appendHeaders(response)
         conn.send(response)
 
     conn.close()
